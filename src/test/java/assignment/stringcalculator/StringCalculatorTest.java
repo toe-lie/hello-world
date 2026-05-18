@@ -32,4 +32,16 @@ public class StringCalculatorTest {
         int result = calculator.add("1,2,3");
         assertThat(result, is(6));
     }
+
+    @Test
+    void multiple_numbers_with_newline_return_sum_of_those_numbers() {
+        int result = calculator.add("1\n2,3");
+        assertThat(result, is(6));
+    }
+
+    @Test
+    void multiple_numbers_with_complex_delimiters_return_sum_of_those_numbers() {
+        int result = calculator.add("//;\n1;2");
+        assertThat(result, is(3));
+    }
 }
