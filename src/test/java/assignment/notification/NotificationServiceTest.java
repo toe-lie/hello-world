@@ -29,7 +29,8 @@ public class NotificationServiceTest {
 
     @Test
     void sendPasswordReset_includes_the_reset_token_in_the_email_body() {
-        service.sendPasswordReset(user);
-        verify(emailSender).send(eq(user.getEmail()), contains("reset token"));
+        String token = "ABC123";
+        service.sendPasswordReset(user, token);
+        verify(emailSender).send(eq(user.getEmail()), contains(token));
     }
 }

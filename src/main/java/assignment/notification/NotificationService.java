@@ -11,7 +11,7 @@ public class NotificationService {
         emailSender.send(user.getEmail(), "Welcome to our website!");
     }
 
-    public void sendPasswordReset(User user) {
-        emailSender.send(user.getEmail(), "Your password reset token is here:");
+    public void sendPasswordReset(User user, String token) {
+        emailSender.send(user.getEmail(), "Your password reset token is: " + token);
     }
 }
