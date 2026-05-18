@@ -3,7 +3,7 @@ import java.util.Iterator;
 import java.util.List;
 
 public class ShoppingCart {
-    List<Item> items = new ArrayList<>();
+    private List<Item> items = new ArrayList<>();
 
     public int getItemCount() {
         return items.size();
