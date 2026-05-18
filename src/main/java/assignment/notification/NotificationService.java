@@ -2,14 +2,12 @@ package assignment.notification;
 
 public class NotificationService {
     private final EmailSender emailSender;
-    private final EmailTemplate emailTemplate;
 
-    public NotificationService(EmailSender emailSender, EmailTemplate emailTemplate) {
+    public NotificationService(EmailSender emailSender) {
         this.emailSender = emailSender;
-        this.emailTemplate = emailTemplate;
     }
 
     public void sendWelcomeEmail(User user) {
-        emailSender.send(user.getEmail(), emailTemplate.getWelcomeMessage());
+        emailSender.send(user.getEmail(), "Welcome to our website!");
     }
 }
