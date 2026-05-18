@@ -5,6 +5,11 @@ public class StringCalculator {
         if (input.isEmpty()) {
             return 0;
         }
-        return Integer.parseInt(input);
+        final String[] chunks = input.split(",");
+        int sum = 0;
+        for (String chunk : chunks) {
+            sum += Integer.parseInt(chunk);
+        }
+        return sum;
     }
 }

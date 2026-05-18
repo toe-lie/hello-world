@@ -26,4 +26,10 @@ public class StringCalculatorTest {
         int result = calculator.add("5");
         assertThat(result, is(5));
     }
+
+    @Test
+    void multiple_numbers_return_sum_of_those_numbers() {
+        int result = calculator.add("1,2,3");
+        assertThat(result, is(6));
+    }
 }
