@@ -14,6 +14,7 @@ dependencies {
     testImplementation("org.junit.jupiter:junit-jupiter")
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
     testImplementation("org.hamcrest:hamcrest:3.0")
+    testImplementation("org.mockito:mockito-core:5.+")
 }
 
 tasks.test {
