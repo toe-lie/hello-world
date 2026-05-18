@@ -10,22 +10,20 @@ public class NotificationService {
     }
 
     public void sendWelcomeEmail(User user) {
-        sendEmail(user.getEmail(), "Welcome to our website!");
-    }
-
-    public void sendPasswordReset(User user, String token) {
-        sendEmail(user.getEmail(), "Your password reset token is: " + token);
-    }
-
-    private void sendEmail(String recipient, String message) {
         try {
-            emailSender.send(recipient, message);
+            emailSender.send(user.getEmail(), "Welcome to our website!");
         } catch (Exception e) {
-            logException(e);
+            logger.log("error: Failed to send welcome email to " + user.getEmail() + ": " + e.getMessage());
+            throw new NotificationException("Failed to send welcome email", e);
         }
     }
 
-    private void logException(Exception e) {
-        logger.log("error: " + e.getMessage());
+    public void sendPasswordReset(User user, String token) {
+        try {
+            emailSender.send(user.getEmail(), "Your password reset token is:" + token);
+        } catch (Exception e) {
+            logger.log("error: Failed to send password reset email to " + user.getEmail() + ": " + e.getMessage());
+            throw new NotificationException("Failed to send password reset email", e);
+        }
     }
 }

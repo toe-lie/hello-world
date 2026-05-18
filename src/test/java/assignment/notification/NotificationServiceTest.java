@@ -40,7 +40,7 @@ public class NotificationServiceTest {
     void log_exception_when_sending_email_fails() {
         doThrow(new RuntimeException("Email sending failed"))
                 .when(emailSender).send(anyString(), anyString());
-        service.sendWelcomeEmail(user);
+        assertThrows(NotificationException.class, () -> service.sendWelcomeEmail(user));
         verify(logger).log(contains("error"));
     }
 }
