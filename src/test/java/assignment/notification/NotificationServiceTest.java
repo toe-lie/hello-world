@@ -37,7 +37,7 @@ public class NotificationServiceTest {
     }
 
     @Test
-    void log_exception_when_sending_email_fails() {
+    void sendWelcomeEmail_throwsNotificationException_and_logsError_whenEmailSenderFails() {
         doThrow(new RuntimeException("Email sending failed"))
                 .when(emailSender).send(anyString(), anyString());
         assertThrows(NotificationException.class, () -> service.sendWelcomeEmail(user));
