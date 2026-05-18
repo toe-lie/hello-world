@@ -3,21 +3,23 @@ package assignment.notification;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.contains;
 import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.*;
 
 public class NotificationServiceTest {
 
     private NotificationService service;
     private EmailSender emailSender;
+    private Logger logger;
     private User user;
 
     @BeforeEach
     void setUp() {
         emailSender = mock(EmailSender.class);
-        service = new NotificationService(emailSender);
+        logger = mock(Logger.class);
+        service = new NotificationService(emailSender, logger);
         user = new User("test@example.com");
     }
 
@@ -32,5 +34,13 @@ public class NotificationServiceTest {
         String token = "ABC123";
         service.sendPasswordReset(user, token);
         verify(emailSender).send(eq(user.getEmail()), contains(token));
+    }
+
+    @Test
+    void log_exception_when_sending_email_fails() {
+        doThrow(new RuntimeException("Email sending failed"))
+                .when(emailSender).send(anyString(), anyString());
+        service.sendWelcomeEmail(user);
+        verify(logger).log(contains("error"));
     }
 }
