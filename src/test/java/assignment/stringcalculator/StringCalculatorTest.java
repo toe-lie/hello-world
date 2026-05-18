@@ -13,4 +13,11 @@ public class StringCalculatorTest {
         int result = calculator.add("");
         assertThat(result, is(0));
     }
+
+    @Test
+    void single_number_return_that_number() {
+        StringCalculator calculator = new StringCalculator();
+        int result = calculator.add("1");
+        assertThat(result, is(1));
+    }
 }
