@@ -10,4 +10,8 @@ public class NotificationService {
     public void sendWelcomeEmail(User user) {
         emailSender.send(user.getEmail(), "Welcome to our website!");
     }
+
+    public void sendPasswordReset(User user) {
+        emailSender.send(user.getEmail(), "Your password reset token is here:");
+    }
 }
