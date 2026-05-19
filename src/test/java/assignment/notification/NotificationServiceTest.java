@@ -2,6 +2,8 @@ package assignment.notification;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.contains;
@@ -23,8 +25,12 @@ public class NotificationServiceTest {
         user = new User("test@example.com");
     }
 
-    @Test
-    void sendWelcomeEmail_sent_to_the_right_address_with_the_right_message() {
+    @ParameterizedTest()
+    @ValueSource(strings = {"test@example.com", "user@example.org"})
+    void sendWelcomeEmail_sent_to_the_right_addresses_with_the_right_message(
+            String email
+    ) {
+        User user = new User(email);
         service.sendWelcomeEmail(user);
         verify(emailSender).send(user.getEmail(), "Welcome to our website!");
     }
