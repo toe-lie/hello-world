@@ -27,7 +27,7 @@ public class NotificationServiceTest {
 
     @ParameterizedTest()
     @ValueSource(strings = {"test@example.com", "user@example.org"})
-    void sendWelcomeEmail_sent_to_the_right_addresses_with_the_right_message(
+    void sendWelcomeEmail_sendsToCorrectAddress_forAnyUser(
             String email
     ) {
         User user = new User(email);
@@ -48,5 +48,19 @@ public class NotificationServiceTest {
                 .when(emailSender).send(anyString(), anyString());
         assertThrows(NotificationException.class, () -> service.sendWelcomeEmail(user));
         verify(logger).log(contains("error"));
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {
+            "Connection refused",
+            "Timeout exceeded",
+            "Authentication failed"
+    })
+    void sendWelcomeEmail_logsErrorMessage_whenEmailSenderFails(String errorMessage) {
+        doThrow(new RuntimeException(errorMessage))
+                .when(emailSender).send(anyString(), anyString());
+
+        assertThrows(NotificationException.class, () -> service.sendWelcomeEmail(user));
+        verify(logger).log("error: Failed to send email to " + user.getEmail() + ": " + errorMessage);
     }
 }
