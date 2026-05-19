@@ -1,9 +1,12 @@
 package assignment.notification;
 
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
+import org.mockito.Mockito;
 
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.contains;
@@ -25,42 +28,70 @@ public class NotificationServiceTest {
         user = new User("test@example.com");
     }
 
-    @ParameterizedTest()
-    @ValueSource(strings = {"test@example.com", "user@example.org"})
-    void sendWelcomeEmail_sendsToCorrectAddress_forAnyUser(
-            String email
-    ) {
-        User user = new User(email);
-        service.sendWelcomeEmail(user);
-        verify(emailSender).send(user.getEmail(), "Welcome to our website!");
+    @Nested
+    @DisplayName("sendWelcomeEmail")
+    class SendWelcomeEmail {
+
+        @ParameterizedTest()
+        @ValueSource(strings = {"test@example.com", "user@example.org"})
+        @DisplayName("sends to correct address for any user (parameterized)")
+        void sendsToCorrectAddress(
+                String email
+        ) {
+            User user = new User(email);
+            service.sendWelcomeEmail(user);
+            verify(emailSender).send(user.getEmail(), "Welcome to our website!");
+        }
+
+        @Nested
+        @DisplayName("when email sender fails")
+        class WhenEmailSenderFails {
+            private final String errorMessage = "SMTP down";
+
+            @BeforeEach
+            void setUp() {
+                doThrow(new RuntimeException(errorMessage))
+                        .when(emailSender).send(anyString(), anyString());
+            }
+
+            @Test
+            @DisplayName("throws NotificationException")
+            void throwsNotificationException() {
+                assertThrows(NotificationException.class, () -> service.sendWelcomeEmail(user));
+            }
+
+            @Test
+            @DisplayName("logs the error message")
+            void logsErrorMessage() {
+                assertThrows(NotificationException.class, () -> service.sendWelcomeEmail(user));
+                verify(logger).log("error: Failed to send email to " + user.getEmail() + ": " + errorMessage);
+            }
+
+            @ParameterizedTest
+            @ValueSource(strings = {
+                    "Connection refused",
+                    "Timeout exceeded",
+                    "Authentication failed"
+            })
+            @DisplayName("logs error messages for specific error messages")
+            void logsErrorMessages(String errorMessage) {
+                doThrow(new RuntimeException(errorMessage))
+                        .when(emailSender).send(anyString(), anyString());
+                assertThrows(NotificationException.class, () -> service.sendWelcomeEmail(user));
+                verify(logger).log("error: Failed to send email to " + user.getEmail() + ": " + errorMessage);
+            }
+        }
     }
 
-    @Test
-    void sendPasswordReset_includes_the_reset_token_in_the_email_body() {
-        String token = "ABC123";
-        service.sendPasswordReset(user, token);
-        verify(emailSender).send(eq(user.getEmail()), contains(token));
-    }
-
-    @Test
-    void sendWelcomeEmail_throwsNotificationException_and_logsError_whenEmailSenderFails() {
-        doThrow(new RuntimeException("Email sending failed"))
-                .when(emailSender).send(anyString(), anyString());
-        assertThrows(NotificationException.class, () -> service.sendWelcomeEmail(user));
-        verify(logger).log(contains("error"));
-    }
-
-    @ParameterizedTest
-    @ValueSource(strings = {
-            "Connection refused",
-            "Timeout exceeded",
-            "Authentication failed"
-    })
-    void sendWelcomeEmail_logsErrorMessage_whenEmailSenderFails(String errorMessage) {
-        doThrow(new RuntimeException(errorMessage))
-                .when(emailSender).send(anyString(), anyString());
-
-        assertThrows(NotificationException.class, () -> service.sendWelcomeEmail(user));
-        verify(logger).log("error: Failed to send email to " + user.getEmail() + ": " + errorMessage);
+    @Nested
+    @DisplayName("sendPasswordReset")
+    class SendPasswordReset {
+        @Test
+        @DisplayName("sends the reset token")
+        void sendsResetToken() {
+            String token = "ABC123";
+            service.sendPasswordReset(user, token);
+            verify(emailSender).send(eq(user.getEmail()), contains(token));
+        }
     }
 }
